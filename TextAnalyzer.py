@@ -31,17 +31,18 @@ class TextAnalyzer:
         self.title   = title
         self.content = content
 
-        list = self.ngrams(content, 2)
-        print "NGrams --> ", list
+        list = self.ngramsAsTuples(content, 2)
+        #print "NGrams --> ", list
         #for item in list:
             #print item
         print "len ", len(list)
         #print list
-        tags = self.getNgramsFrequency(list)
+        #tags = self.getNgramsFrequency(list)
 
-        titleFreq   = self.getWordsFrequency(self.title)
-        contentFreq = self.getWordsFrequency(self.content)
+        #titleFreq   = self.getWordsFrequency(self.title)
+        #contentFreq = self.getWordsFrequency(self.content)
 
+        print self.filter(self.sortedNgrams(content, 2))
         #print "Tags --> ", tags
 
 
@@ -77,16 +78,75 @@ class TextAnalyzer:
         #map = OrderedDict(map.items(), key=lambda t: t[1], reverse=True)
         #dict = Counter( map ).most_common()
         map = sorted(map.items(), key=lambda x:x[1], reverse=True)
-        #map = OrderedDict(map.items(), key=lambda t: t[1], reverse=True)
-        print "ngrams-> ", map
+        #map = OrderedDict(map.items(), key=lambda t: t[1], reverse=True)        
 
         return map
 
+    
+
+    def sortedNgrams( self, input, n):
+        return self.sortFrequencies( self.ngrams(input, n) )
+    
+    """
+    returns ngrams as lists
+    """
     def ngrams(self, input, n):
+        input = self.cleanInput(input)
+        output = defaultdict(int)
+
+        for i in range(len(input)-n+1):            
+            key = " ".join( input[i:i+n] )
+            output[ key ] += 1
+
+        return output
+
+    def sortFrequencies( self, ngrams):
+        return sorted(ngrams.items(), key = operator.itemgetter(1), reverse=True)
+
+
+    def filterCommon(self, ngrams):
+        output = []
+        for item in ngrams:
+            words = item[0].split(" ")
+            for word in words:
+                if not self.isCommon( word ):
+                    output.append( item )
+        return output
+
+    def analyzeSentence(self, sentence):
+        print sentence
+
+
+    def isCommon(self, word):
+
+        """
+        "the", "be", "to", "of", "and", "a", "in", "that", "have", "I", "it", "for", "not", "on", "with", "he", "as", "you",
+        "do", "at", "this", "but", "his", "by", "from", "they", "we", "say", "her", "she", "or", "an" "will", "my", "one", 
+        "all", "would", "there", "their", "what", "so", "up", "out", "if", "about", "who", "get", "which", "go", "me", "when",
+        "make", "can", "like", "time", "no", "just", "him", "know", "take", "person", "into", "year", "your", "good", "some",
+        "could", "them", "see", "other", "than", "then", "now", "look", "only", "come", "its", "over", "think", "also", "back",
+        "after", "use", "two", "how", "our", "work", "first", "well", "way", "even", "new", "want", "because", "any", "these", 
+        "give", "day", "most", "us"
+        """
+        isCommon = [ "the", "be", "to", "of", "and", "a", "in", "that", "have", "I", "it", "for", "not", "on", "with", "he", "as", "you",
+                     "do", "at", "this", "but", "his", "by", "from", "they", "we", "say", "her", "she", "or", "an" "will", "my", "one", 
+                     "all", "would", "there", "their", "what", "so", "up", "out", "if", "about", "who", "get", "which", "go", "me", "when",
+                     "make", "can", "like", "time", "no", "just", "him", "know", "take", "person", "into", "year", "your", "good", "some",
+                     "could", "them", "see", "other", "than", "then", "now", "look", "only", "come", "its", "over", "think", "also", "back",
+                     "after", "use", "two", "how", "our", "work", "first", "well", "way", "even", "new", "want", "because", "any", "these", 
+                     "give", "day", "most", "us"]
+
+        if word in isCommon:
+            return True
+        return False
+
+
+
+    def ngramsAsTuples(self, input, n):
         input = self.cleanInput(input)
 
         output = []
-        for i in range(len(input)-n+1):
+        for i in range(len(input)-n+1):            
             output.append( input[i:i+n] )
 
         return output
