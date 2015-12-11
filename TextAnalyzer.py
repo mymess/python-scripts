@@ -6,6 +6,8 @@ from collections import OrderedDict, Counter, defaultdict
 
 import operator
 
+form NltkHelper import NltkHelper
+
 title = "Reports Claim Satoshi Nakamoto Might Be 44-Year Old Australian"
 
 content  = "New reports by Wired and Gizmodo may have identified the pseudonymous creator of bitcoin, Satoshi Nakamoto, as Australian entrepreneur Craig S Wright. "
@@ -44,6 +46,24 @@ class TextAnalyzer:
 
         print self.filter(self.sortedNgrams(content, 2))
         #print "Tags --> ", tags
+
+
+
+    """
+    Returns list of keywords
+    Keyword: bigram found in both title and content that follows pattern (JJ, NN or FW) or (NN or FW, NN or FW) 
+    """
+    def getKeywords(self):
+        #titles are in many cases all uppercase for first letter
+        n1 = NltkHelper( self.title.lower() )
+        formattedTitle = n1.preprocessTitle()
+
+        n1 = NltkHelper( formattedTitle )
+        n2 = NltkHelper( self.content )
+
+        matches = list( set(n1.findTags()) & set(n2.findTags()) )
+        return matches
+
 
 
     def cleanInput(self, input):
@@ -88,7 +108,7 @@ class TextAnalyzer:
         return self.sortFrequencies( self.ngrams(input, n) )
     
     """
-    returns ngrams as lists
+    returns ngrams as dict key:lists, value: occurences
     """
     def ngrams(self, input, n):
         input = self.cleanInput(input)
